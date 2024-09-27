@@ -33,5 +33,35 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
+<<<<<<< HEAD
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 # NS-Burn-Leaderboard
+=======
+5. Run the development server:
+   ```
+   bun run dev
+   ```
+
+6. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+## Usage
+
+1. Connect your Solana wallet using the "Connect Wallet" button.
+2. Once connected, you'll see the current Solana network slot and the number of Network School Cryptocredentials NFTs in your wallet.
+3. The leaderboard displays users ranked by their NFT count.
+
+## Project Structure
+
+- `pages/`: Contains the main pages of the application
+- `components/`: Reusable React components
+- `lib/`: Utility functions and API calls
+- `styles/`: Global styles and Tailwind CSS configuration
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License.# NS-Burn-Leaderboard
+>>>>>>> 782d221 (first commit)
