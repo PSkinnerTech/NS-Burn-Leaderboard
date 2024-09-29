@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useRouter } from 'next/navigation'
@@ -24,7 +24,11 @@ interface LeaderboardUser {
   nft_count: number
 }
 
-export default function LeaderboardPage() {
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function LeaderboardContent() {
   const { publicKey, connected } = useWallet()
   const [nftCount, setNftCount] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -85,6 +89,7 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
+      await delay(3000); // 3-second delay
       setIsLoading(true)
       try {
         const { data, error } = await supabase
@@ -152,4 +157,20 @@ export default function LeaderboardPage() {
       </Card>
     </div>
   )
+}
+
+function LoadingSpinner() {
+  return (
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+    </div>
+  );
+}
+
+export default function LeaderboardPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <LeaderboardContent />
+    </Suspense>
+  );
 }
