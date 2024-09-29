@@ -139,7 +139,7 @@ function LeaderboardContent() {
                 <TableRow>
                   <TableHead className="w-[100px]">Rank</TableHead>
                   <TableHead>Name</TableHead>
-                  <TableHead className="text-right">NFT Count</TableHead>
+                  <TableHead className="text-right">Total Burn NFTs</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
