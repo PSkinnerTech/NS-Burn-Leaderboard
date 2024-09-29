@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { useRouter } from 'next/navigation';
 import { getAssetsByCollectionAddress } from '@/lib/nftUtils';
 import '@solana/wallet-adapter-react-ui/styles.css';
+import { supabase } from '@/lib/supabaseClient';
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(mod => mod.WalletMultiButton),
@@ -12,9 +14,34 @@ const WalletMultiButton = dynamic(
 );
 
 export default function LeaderboardPage() {
-  const { publicKey } = useWallet();
+  const { publicKey, connected } = useWallet();
   const [nftCount, setNftCount] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!connected) {
+      router.push('/');
+    }
+  }, [connected, router]);
+
+  useEffect(() => {
+    const checkUserRegistration = async () => {
+      if (publicKey) {
+        const { data, error } = await supabase
+          .from('users')
+          .select('first_name, last_name')
+          .eq('wallet_address', publicKey.toString())
+          .single();
+
+        if (error || !data) {
+          router.push('/');
+        }
+      }
+    };
+
+    checkUserRegistration();
+  }, [publicKey, router]);
 
   useEffect(() => {
     const fetchNFTCount = async () => {
