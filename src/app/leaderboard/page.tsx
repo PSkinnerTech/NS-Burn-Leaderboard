@@ -132,7 +132,7 @@ function LeaderboardContent() {
             <p className="text-lg text-center mb-6">You have {nftCount} NS Burn NFTs</p>
           )}
           {isLoading ? (
-            <p className="text-center">Loading leaderboard data...</p>
+            <p className="text-center animate-pulse font-extrabold">Loading leaderboard data...</p>
           ) : (
             <Table>
               <TableHeader>

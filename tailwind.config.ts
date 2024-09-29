@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+		animation: {
+			fade: 'fadeIn .5s ease-in-out',
+		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
