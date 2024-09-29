@@ -1,31 +1,27 @@
-import React from 'react';
-import './globals.css';
-import { Inter } from 'next/font/google';
-import dynamic from 'next/dynamic';
+'use client';
 
-const inter = Inter({ subsets: ['latin'] });
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { clusterApiUrl } from '@solana/web3.js';
+import { useMemo } from 'react';
 
-const WalletContextProvider = dynamic(
-  () => import('@/app/components/WalletContextProvider'),
-  { ssr: false }
-);
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const network = WalletAdapterNetwork.Mainnet;
+  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
-export const metadata = {
-  title: 'Solana NFT Leaderboard',
-  description: 'Leaderboard for NS Burn NFT holders',
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <WalletContextProvider>
-          {children}
-        </WalletContextProvider>
+      <body>
+        <ConnectionProvider endpoint={endpoint}>
+          <WalletProvider wallets={wallets} autoConnect>
+            <WalletModalProvider>
+              {children}
+            </WalletModalProvider>
+          </WalletProvider>
+        </ConnectionProvider>
       </body>
     </html>
   );

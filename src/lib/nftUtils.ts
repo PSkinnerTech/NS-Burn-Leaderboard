@@ -1,96 +1,67 @@
-import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import { mplTokenMetadata, fetchDigitalAsset, fetchDigitalAssetWithTokenByMint } from "@metaplex-foundation/mpl-token-metadata";
-import { publicKey } from "@metaplex-foundation/umi";
-import { Connection, PublicKey } from "@solana/web3.js";
+// Remove the dotenv require statement
+// const apiKey = process.env.HELIUS_API_KEY;
+const url = `https://mainnet.helius-rpc.com/?api-key=${process.env.NEXT_PUBLIC_HELIUS_API_KEY}`;
 
-const QUICKNODE_RPC = "https://nameless-misty-paper.solana-mainnet.quiknode.pro/1f697ad1cc0b0c550141ed27bb0d35c4074f7057/";
-
-// Create a UMI instance with the QuickNode RPC endpoint
-const umi = createUmi(QUICKNODE_RPC);
-
-// Use the mplTokenMetadata plugin
-umi.use(mplTokenMetadata());
-
-// Create a Solana connection using the QuickNode RPC
-const connection = new Connection(QUICKNODE_RPC);
-
-// Network School Cryptocredentials collection address
-const NS_COLLECTION_ADDRESS = "5b4ZfyhVEuHEiUWzoWPrQqvhWD3WLyktPpQm2xs2CnyJ";
-
-export async function getSlot() {
-  try {
-    const slot = await connection.getSlot();
-    console.log("Current slot:", slot);
-    return slot;
-  } catch (error) {
-    console.error("Error fetching slot:", error);
-    throw error;
-  }
+interface Group {
+  group_key: string;
+  group_value: string;
 }
 
-export async function fetchAndLogNFTMetadata(mintAddressString: string) {
-  try {
-    console.log(`Fetching NFT metadata for mint address: ${mintAddressString}`);
-    
-    const mintAddress = publicKey(mintAddressString);
-    const asset = await fetchDigitalAsset(umi, mintAddress);
-
-    console.log("NFT Metadata:");
-    console.log("Name:", asset.metadata.name);
-    console.log("Symbol:", asset.metadata.symbol);
-    console.log("URI:", asset.metadata.uri);
-
-    if (asset.metadata.uri) {
-      const response = await fetch(asset.metadata.uri);
-      const jsonMetadata = await response.json();
-      console.log("\nJSON Metadata:");
-      console.log(JSON.stringify(jsonMetadata, null, 2));
-    }
-
-    return asset;
-  } catch (error) {
-    console.error("Error fetching NFT metadata:", error);
-    throw error;
-  }
+interface Asset {
+  id: string;
+  content: any;
+  grouping: Group[];
 }
 
-export async function getNFTsForOwner(ownerAddress: string) {
-  try {
-    const ownerPublicKey = new PublicKey(ownerAddress);
-    const nftMetadata = await connection.getParsedTokenAccountsByOwner(ownerPublicKey, {
-      programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
-    });
-
-    const nfts = nftMetadata.value.filter(accountInfo => 
-      accountInfo.account.data.parsed.info.tokenAmount.uiAmount === 1 &&
-      accountInfo.account.data.parsed.info.tokenAmount.decimals === 0
-    );
-
-    return nfts;
-  } catch (error) {
-    console.error("Error fetching NFTs for owner:", error);
-    throw error;
-  }
+interface ApiResponse {
+  result: {
+    items: Asset[];
+    nativeBalance: number;
+  };
 }
 
-export async function countNSNFTs(walletAddress: string) {
-  try {
-    const nfts = await getNFTsForOwner(walletAddress);
-    let nsNftCount = 0;
-
-    for (const nft of nfts) {
-      const mintAddress = nft.account.data.parsed.info.mint;
-      const asset = await fetchDigitalAssetWithTokenByMint(umi, publicKey(mintAddress));
-      
-      if (asset.metadata.collection?.key === NS_COLLECTION_ADDRESS) {
-        nsNftCount++;
-      }
-    }
-
-    console.log(`Found ${nsNftCount} Network School Cryptocredentials NFTs in wallet ${walletAddress}`);
-    return nsNftCount;
-  } catch (error) {
-    console.error("Error counting NS NFTs:", error);
-    throw error;
+export const getAssetsByCollectionAddress = async (address: string) => {
+  if (!process.env.NEXT_PUBLIC_HELIUS_API_KEY) {
+    throw new Error('HELIUS_API_KEY is not set in environment variables');
   }
-}
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 'my-id',
+      method: 'getAssetsByOwner',
+      params: {
+        ownerAddress: address,
+        displayOptions: {
+          showFungible: true,
+          showNativeBalance: true,
+        },
+      },
+    }),
+  });
+
+  const { result } = (await response.json()) as ApiResponse;
+  
+  const collectionAddresses = [
+    'DtJXwtEDbzhRvAfETjHtNyopS275QyvKS2RGBUc1hY4y',
+    'SPpCU2d2wE8nA51EqPDzUQZqDDEAP2bGJzzbLio4Pcn',
+    'Fvpn3WGqT8n5bgYuHdSr5xLS6V6GtYDS2w5jjhhS5s8z'
+  ];
+  
+  const filteredAssets = result.items.filter((item: Asset) => 
+    item.grouping && 
+    item.grouping.some(group => 
+      group.group_key === 'collection' && 
+      collectionAddresses.includes(group.group_value)
+    )
+  );
+
+  return {
+    totalAssets: result.items.length,
+    nsBurnNFTs: filteredAssets.length
+  };
+};
