@@ -5,8 +5,8 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import '@solana/wallet-adapter-react-ui/styles.css';
-import { supabase } from '@/lib/supabaseClient';  // Add this import
-import UserRegistration from '@/app/components/UserRegistration';
+import { supabase } from '@/lib/supabaseClient';
+import UserRegistration from '@/components/UserRegistration';
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(mod => mod.WalletMultiButton),
