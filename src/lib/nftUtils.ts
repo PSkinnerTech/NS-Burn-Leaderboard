@@ -61,7 +61,6 @@ export const getAssetsByCollectionAddress = async (address: string) => {
   );
 
   return {
-    totalAssets: result.items.length,
-    nsBurnNFTs: filteredAssets.length
+    nftCount: filteredAssets.length
   };
 };
