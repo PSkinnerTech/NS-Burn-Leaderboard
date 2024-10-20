@@ -15,14 +15,18 @@ export default function UserRegistration({ walletAddress }: UserRegistrationProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase
-      .from('users')
-      .upsert({ wallet_address: walletAddress, first_name: firstName, last_name: lastName });
+    try {
+      const { error } = await supabase
+        .from('users')
+        .upsert({ wallet_address: walletAddress, first_name: firstName, last_name: lastName });
 
-    if (error) {
-      console.error('Error registering user:', error);
-    } else {
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       router.push('/leaderboard');
+    } catch (error) {
+      console.error('Error registering user:', error);
     }
   };
 
