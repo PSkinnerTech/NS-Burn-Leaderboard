@@ -49,7 +49,9 @@ export const getAssetsByCollectionAddress = async (address: string) => {
   const collectionAddresses = [
     'DtJXwtEDbzhRvAfETjHtNyopS275QyvKS2RGBUc1hY4y',
     'SPpCU2d2wE8nA51EqPDzUQZqDDEAP2bGJzzbLio4Pcn',
-    'Fvpn3WGqT8n5bgYuHdSr5xLS6V6GtYDS2w5jjhhS5s8z'
+    'Fvpn3WGqT8n5bgYuHdSr5xLS6V6GtYDS2w5jjhhS5s8z',
+    `G9J5kHtRsyTQaWFBh6ySNo9M4V8iAXZ9H5G1aRzpzLi5`
+    
   ];
   
   const filteredAssets = result.items.filter((item: Asset) => 
