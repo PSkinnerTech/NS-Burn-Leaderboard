@@ -45,7 +45,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-gray-100">
-      <h1 className="text-4xl font-bold mb-8 text-center">NS Burn Leaderboard</h1>
+      <h1 className="text-4xl font-bold mb-8 text-center">NS Burn Leaderboard - Metaplex Version</h1>
       <div className="p-4 bg-white rounded-lg shadow-md fade-in-5">
         <WalletMultiButton className="!bg-black hover:!bg-black transition-colors duration-200" />
       </div>
